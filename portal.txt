@@ -1,0 +1,54 @@
+#Импорт
+from news.models import Author
+from news.models import Category
+from news.models import Post
+from news.models import Comment
+
+# Создание 2 пользователей
+user1 = User.objects.create_user('user1', password='password123')
+user2 = User.objects.create_user('user2', password='password456')
+
+# Создание 2 объектов Author, связанных с пользователями
+author1 = Author.objects.create(user=user1)
+author2 = Author.objects.create(user=user2)
+
+# Добавление 4 категорий в модель Category
+category1 = Category.objects.create(name='Спорт')
+category2 = Category.objects.create(name='Политика')
+category3 = Category.objects.create(name='Образование')
+category4 = Category.objects.create(name='Технологии')
+
+# Добавление 2 статей и 1 новости
+post1 = Post.objects.create(author=author1, post_type='article', title='Статья 1', text='Текст статьи 1')
+post2 = Post.objects.create(author=author1, post_type='article', title='Статья 2', text='Текст статьи 2')
+post3 = Post.objects.create(author=author2, post_type='news', title='Новость 1', text='Текст новости 1')
+
+# Присвоение категорий
+post1.categories.add(category1, category2)
+post2.categories.add(category3)
+post3.categories.add(category4)
+
+# Создание 4 комментариев к разным объектам модели Post
+comment1 = Comment.objects.create(post=post1, user=user1, text='Комментарий к статье 1')
+comment2 = Comment.objects.create(post=post1, user=user2, text='Другой комментарий к статье 1')
+comment3 = Comment.objects.create(post=post2, user=user1, text='Комментарий к статье 2')
+comment4 = Comment.objects.create(post=post3, user=user2, text='Комментарий к новости 1')
+
+# Применяя функции like() и dislike() к статьям/новостям и комментариям
+post1.like()
+post1.like()
+post2.dislike()
+comment1.like()
+comment2.dislike()
+
+# Обновление рейтингов пользователей
+author1.update_rating()
+author2.update_rating()
+
+# Вывод username и рейтинг лучшего пользователя
+best_user = User.objects.order_by('-author__rating').first()
+print(best_user.username, best_user.author.rating)
+
+# Вывод данных о лучшей статье
+best_post = Post.objects.order_by('-rating').first()
+print(best_post.created_at, best_post.author.user.username, best_post.rating, best_post.title, best_post.preview())
