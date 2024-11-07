@@ -1,0 +1,9 @@
+<form method="get">
+    {{ filter.form.as_p }}
+    <button type="submit">Поиск</button>
+</form>
+
+{% for post in filter.qs %}
+    <h2>{{ post.title }}</h2>
+    <p>{{ post.preview }}</p>
+{% endfor %}
