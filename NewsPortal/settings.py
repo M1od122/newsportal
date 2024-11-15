@@ -39,10 +39,37 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'django.contrib.flatpages',
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.yandex',
     'news',
     'Censor',
     'Custom'
 ]
+
+SOCIALACCOUNT_PROVIDERS = {
+    'yandex': {
+        'METHOD': 'oauth2',
+        'SCOPE': ['login:management'],
+        'AUTH_PARAMS': {'access_type': 'online'},
+        'CLIENT_ID': 'e2ca1cefb6864f3a93fe998209968d66',
+        'SECRET': 'ad63c615aa4645b48b1b0d567ede7586',
+    }
+}
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+)
+
+SITE_ID = 1
+
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+ACCOUNT_LOGOUT_ON_GET = True
+ACCOUNT_EMAIL_VERIFICATION = "none"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

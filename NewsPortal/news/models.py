@@ -1,5 +1,12 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group, Permission
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.models import AbstractUser
+from django.views.generic import UpdateView
+from django.urls import reverse_lazy
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
 
 class Author(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -63,3 +70,39 @@ class Comment(models.Model):
     def dislike(self):
         self.rating -= 1
         self.save()
+
+class UserProfile(AbstractUser):
+    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
+    bio = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return self.username
+
+class ProfileUpdateView(LoginRequiredMixin, UpdateView):
+    model = User
+    form_class = UserProfileForm
+    template_name = 'profile_edit.html'
+    success_url = reverse_lazy('profile')
+
+@receiver(post_save, sender=User)
+def create_user_groups(sender, instance, created, kwargs):
+    if created:
+        common_group, _ = Group.objects.get_or_create(name='common')
+        common_group.user_set.add(instance)
+
+from django.contrib.auth.decorators import login_required, user_passes_test
+
+def is_author(user):
+    return user.groups.filter(name='authors').exists()
+
+@login_required
+@user_passes_test(is_author)
+def create_news(request):
+
+@login_required
+@user_passes_test(is_author)
+def edit_news(request, pk):
+
+group_authors = Group.objects.get(name='authors')
+permission = Permission.objects.get(codename='add_post')
+group_authors.permissions.add(permission)

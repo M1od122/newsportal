@@ -28,4 +28,8 @@ urlpatterns = [
     path('news/<int:post_id>/', news_detail, name='news_detail'),
     path('admin/', admin.site.urls),
     path('pages/', include('django.contrib.flatpages.urls')),
+    path('accounts/login/', allauth_views.LoginView.as_view(), name='account_login'),
+    path('accounts/signup/', allauth_views.SignupView.as_view(), name='account_signup'),
+    path('accounts/yandex/login/', allauth_views.YandexOAuth2Adapter.as_view(), name='yandex_login'),
+    path('profile/edit/', ProfileUpdateView.as_view(), name='edit_profile'),
 ]
