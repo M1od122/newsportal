@@ -32,4 +32,5 @@ urlpatterns = [
     path('accounts/signup/', allauth_views.SignupView.as_view(), name='account_signup'),
     path('accounts/yandex/login/', allauth_views.YandexOAuth2Adapter.as_view(), name='yandex_login'),
     path('profile/edit/', ProfileUpdateView.as_view(), name='edit_profile'),
+    path('subscribe/', subscribe_view, name='subscribe'),
 ]

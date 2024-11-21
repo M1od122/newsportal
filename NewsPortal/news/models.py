@@ -106,3 +106,46 @@ def edit_news(request, pk):
 group_authors = Group.objects.get(name='authors')
 permission = Permission.objects.get(codename='add_post')
 group_authors.permissions.add(permission)
+
+class Category(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+class Subscription(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('user', 'category')
+
+class Article(models.Model):
+    title = models.CharField(max_length=100)
+    content = models.TextField()
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+@receiver(post_save, sender=Article)
+def send_article_notification(sender, instance, created, **kwargs):
+    if created:
+        subscriptions = Subscription.objects.filter(category=instance.category)
+        for subscription in subscriptions:
+            send_mail(
+                'Новая статья в вашей подписке',
+                f'Новая статья: {instance.title}\n\nПодробнее: http://your-site.com/articles/{instance.id}/',
+                'from@example.com',
+                [subscription.user.email],
+                fail_silently=False,
+            )
+
+@receiver(post_save, sender=User)
+def send_welcome_email(sender, instance, created, **kwargs):
+    if created:
+        send_mail(
+            'Добро пожаловать!',
+            'Спасибо за регистрацию на нашем сайте!',
+            'from@example.com',
+            [instance.email],
+            fail_silently=False,
+        )

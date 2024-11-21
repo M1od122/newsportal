@@ -1,6 +1,9 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Post
 from django.core.paginator import Paginator
+from .models import Subscription
+from .forms import SubscriptionForm
+
 
 
 
@@ -50,3 +53,14 @@ def post_delete(request, pk):
         post.delete()
         return redirect('news_list')
     return render(request, 'news/post_confirm_delete.html', {'post': post})
+
+def subscribe_view(request):
+    if request.method == 'POST':
+        form = SubscriptionForm(request.POST)
+        if form.is_valid():
+            category = form.cleaned_data['category']
+            Subscription.objects.get_or_create(user=request.user, category=category)
+            return redirect('some_view_name')
+    else:
+        form = SubscriptionForm()
+    return render(request, 'subscribe.html', {'form': form})
