@@ -5,19 +5,20 @@ from django.utils import timezone
 from datetime import timedelta
 
 @shared_task
-def send_weekly_article_summary():
+def my_job():
     one_week_ago = timezone.now() - timedelta(days=7)
     articles = Article.objects.filter(created_at__gte=one_week_ago)
-    subscriptions = Subscription.objects.all()
 
-    for subscription in subscriptions:
-        user_articles = articles.filter(category=subscription.category)
-        if user_articles.exists():
-            article_links = '\n'.join([f"{article.title}: http://your-site.com/articles/{article.id}/" for article in user_articles])
-            send_mail(
-                'Ваш еженедельный обзор статей',
-                f'За последнюю неделю были опубликованы следующие статьи:\n{article_links}',
-                'from@example.com',
-                [subscription.user.email],
-                fail_silently=False,
-            )
+    if articles.exists():
+        subscriptions = Subscription.objects.all()
+        for subscription in subscriptions:
+            user_articles = articles.filter(category=subscription.category)
+            if user_articles.exists():
+                article_links = '\n'.join([f"{article.title}: http://your-site.com/articles/{article.id}/" for article in user_articles])
+                send_mail(
+                    'Ваш еженедельный обзор статей',
+                    f'За последнюю неделю были опубликованы следующие статьи:\n{article_links}',
+                    'from@example.com',
+                    [subscription.user.email],
+                    fail_silently=False,
+                )
