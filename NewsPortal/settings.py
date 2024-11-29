@@ -31,7 +31,7 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
-INSTALLED_APPS = [
+INSTALLED_APPS = {
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -47,8 +47,9 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.yandex',
     'news',
     'Censor',
-    'Custom'
-]
+    'Custom',
+    'signals',
+}
 
 SOCIALACCOUNT_PROVIDERS = {
     'yandex': {
@@ -151,8 +152,18 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'your-email@example.com'
 EMAIL_HOST_PASSWORD = 'your-email-password'
 
+CELERY_BEAT_SCHEDULE = {
+    'send-weekly-article-summary': {
+        'task': 'your_app_name.tasks.my_job',
+        'schedule': crontab(hour=8, minute=0, day_of_week='monday'),
+    },
+}
 
-
+CELERY_BROKER_URL = 'redis://localhost:6379'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
